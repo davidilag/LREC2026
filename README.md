@@ -210,6 +210,7 @@ If you use this repository or the FPSC corpus, please cite:
   year = {2026},
   address = {Palma de Mallorca, Spain},
   publisher = {European Language Resources Association (ELRA)},
+  institution = {University of the Faroe Islands},
   keywords = {Faroese, Parliamentary Speech, Automatic Speech Recognition, Weakly-Supervised Transcription, Whisper, Wav2Vec2},
   abstract = {We present FPSC, a 1,600-hour Faroese parliamentary speech corpus comprising approximately 89,000 speeches enriched with detailed speaker and linguistic metadata. The corpus was constructed using a sustainable ASR-assisted pipeline combining speech segmentation, multiple Faroese-adapted ASR systems, and ROVER-based consensus voting for weakly supervised transcription. FPSC represents the first large-scale corpus of natural spoken Faroese and provides an open resource for future research in automatic speech recognition and low-resource language technology.}
 }
