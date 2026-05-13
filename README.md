@@ -34,12 +34,6 @@ LREC2026/
 ├── 4c_Whisper-inference-M3_FO.ipynb
 ├── 4d_Whisper-inference-M4_NO-IS-FO.ipynb
 ├── 5_ROVER_voting_transcripts.ipynb
-│
-├── audio/
-├── metadata/
-├── transcripts/
-├── output/
-└── README.md
 ```
 
 ---
@@ -56,16 +50,10 @@ Script:
 
 Purpose:
 
-- Download parliamentary session recordings
-- Download metadata from the parliament website
-- Store session IDs, speaker information, and dates
-
-Output:
-
-```text
-raw_audio/
-raw_metadata/
-```
+- Connects to the public Faroese Parliament (*Løgtingið*) website and automatically retrieves parliamentary meeting recordings together with associated metadata.
+- Extracts information such as meeting IDs, dates, agenda items, speaker order, timestamps, and links to individual recordings.
+- Organizes the downloaded recordings and metadata into a structured format that can be used in later processing stages.
+- Forms the foundation of the corpus creation pipeline by transforming publicly available parliamentary data into machine-readable resources.
 
 ---
 
@@ -79,22 +67,10 @@ Script:
 
 Purpose:
 
-- Convert recordings to WAV
-- Resample audio to 16 kHz mono
-- Normalize audio
-- Prepare files for segmentation
-
-Typical preprocessing:
-
-```bash
-ffmpeg -i input.mp4 -ar 16000 -ac 1 output.wav
-```
-
-Output:
-
-```text
-audio_wav/
-```
+- Converts downloaded parliamentary recordings into a standardized WAV audio format suitable for ASR processing.
+- Resamples all audio to 16 kHz mono in order to ensure compatibility across the different ASR systems used in the pipeline.
+- Applies normalization and cleaning procedures to reduce inconsistencies in recording quality between parliamentary sessions.
+- Prepares the recordings for segmentation by creating a consistent and reproducible audio processing pipeline.
 
 ---
 
@@ -108,15 +84,10 @@ Script:
 
 Purpose:
 
-- Split long parliamentary sessions into smaller speech segments
-- Remove silence and non-speech regions
-- Produce ASR-ready chunks
-
-Output:
-
-```text
-segments/
-```
+- Splits long parliamentary recordings into smaller speech segments corresponding to individual speaker contributions.
+- Uses metadata timestamps together with speech boundary processing to isolate speeches from debates and parliamentary sessions.
+- Removes problematic or invalid segments such as overlapping timestamps, zero-length segments, or incorrectly aligned regions.
+- Produces speech chunks that are optimized for downstream ASR inference and transcript generation.
 
 ---
 
@@ -130,14 +101,10 @@ Script:
 
 Purpose:
 
-- Generate transcripts using the Wav2Vec2 M1 model
-- Continual pretraining (CPT) Faroese model
-
-Output:
-
-```text
-hypotheses/model1/
-```
+- Performs ASR inference using a continually pretrained Wav2Vec2 XLS-R model adapted to Faroese parliamentary speech.
+- Generates weakly supervised transcripts for each speech segment using a model exposed to approximately 1,000 hours of Faroese parliamentary audio during continual pretraining.
+- Produces transcripts with strong domain adaptation to parliamentary speech patterns, pronunciation variation, and spontaneous spoken Faroese.
+- Serves as one of the primary transcription systems used later in the ROVER ensemble voting process.
 
 ---
 
@@ -151,14 +118,10 @@ Script:
 
 Purpose:
 
-- Generate transcripts using the Wav2Vec2 M2 model
-- Faroese fine-tuned model
-
-Output:
-
-```text
-hypotheses/model2/
-```
+- Performs ASR inference using a Faroese fine-tuned Wav2Vec2 XLS-R model trained on the Ravnursson Faroese speech corpus.
+- Generates an additional independent transcription hypothesis for every speech segment in the dataset.
+- Introduces architectural and prediction diversity into the ensemble setup, which improves robustness during ROVER voting.
+- Provides a comparison point between standard fine-tuning and continual pretraining approaches for Faroese ASR.
 
 ---
 
@@ -172,14 +135,10 @@ Script:
 
 Purpose:
 
-- Generate transcripts using Whisper M3
-- Faroese Whisper model
-
-Output:
-
-```text
-hypotheses/model3/
-```
+- Performs ASR inference using a Whisper Large model fine-tuned specifically on Faroese speech data.
+- Generates weak transcripts using a transformer-based multilingual ASR architecture different from the Wav2Vec2 systems.
+- Captures complementary prediction patterns and decoding behavior that improve ensemble diversity.
+- Contributes Faroese-specific transcription hypotheses to the later ROVER consensus generation stage.
 
 ---
 
@@ -193,14 +152,10 @@ Script:
 
 Purpose:
 
-- Generate transcripts using multilingual Whisper M4
-- Norwegian–Icelandic–Faroese adapted model
-
-Output:
-
-```text
-hypotheses/model4/
-```
+- Performs ASR inference using a multilingual Whisper model fine-tuned on Norwegian, Icelandic, and Faroese speech.
+- Exploits linguistic and phonetic similarities between closely related North Germanic languages to improve Faroese recognition performance.
+- Generates multilingual-informed transcription hypotheses with lower word error rates on spontaneous parliamentary speech.
+- Adds complementary multilingual predictions to the ensemble voting system used for final transcript generation.
 
 ---
 
@@ -214,19 +169,11 @@ Script:
 
 Purpose:
 
-- Combine multiple ASR hypotheses
-- Generate consensus transcripts using ROVER voting
-- Produce final transcript outputs
-
-Input:
-
-- transcripts from M1–M4
-
-Output:
-
-```text
-final_transcripts/
-```
+- Combines transcripts from all four ASR systems into a single consensus transcription using ROVER (Recognizer Output Voting Error Reduction).
+- Aligns the different ASR hypotheses and performs weighted voting to determine the most likely word sequence for each speech segment.
+- Uses model performance statistics such as WER and CER to assign weights to the different ASR systems during voting.
+- Produces the final weakly supervised transcripts used in the Faroese Parliament Speech Corpus (FPSC).
+- Generates transcript metadata, confidence scores, and final corpus-ready outputs for downstream ASR and language technology research.
 
 ---
 
@@ -267,6 +214,13 @@ If you use this repository or the FPSC corpus, please cite:
   abstract = {We present FPSC, a 1,600-hour Faroese parliamentary speech corpus comprising approximately 89,000 speeches enriched with detailed speaker and linguistic metadata. The corpus was constructed using a sustainable ASR-assisted pipeline combining speech segmentation, multiple Faroese-adapted ASR systems, and ROVER-based consensus voting for weakly supervised transcription. FPSC represents the first large-scale corpus of natural spoken Faroese and provides an open resource for future research in automatic speech recognition and low-resource language technology.}
 }
 ```
+---
+
+# FPSC Dataset
+
+The final Faroese Parliament Speech Corpus (FPSC) dataset is publicly available on Hugging Face:
+
+https://huggingface.co/datasets/davidilag/FPSC
 
 ---
 
